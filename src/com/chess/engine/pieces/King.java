@@ -5,6 +5,7 @@ import com.chess.engine.board.Board;
 import com.chess.engine.board.BoardUtils;
 import com.chess.engine.board.Move;
 import com.chess.engine.board.Square;
+import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,10 +14,23 @@ import java.util.List;
 public class King extends Piece {
 
     private final static int[] CANDIDATE_MOVE_COORDINATE = {-9, -8, -7, -1, 1, 7, 8, 9};
+    private  final boolean isCastled;
+    private final boolean kingSideCastleCapable;
+    private final boolean queenSideCastleCapable;
 
+    public King(final Color pieceColor, final int piecePosition, final boolean kingSideCastleCapable, final boolean queenSideCastleCapable) {
+        super(PieceType.KING, piecePosition, pieceColor, true);
+        this.isCastled = false;
+        this.kingSideCastleCapable = kingSideCastleCapable;
+        this.queenSideCastleCapable = queenSideCastleCapable;
+    }
 
-    public King(final Color pieceColor, final int piecePosition) {
-        super(piecePosition, pieceColor);
+    public King(final Color pieceColor, final int piecePosition, final boolean isFirstMove, final boolean isCastled,
+                final boolean kingSideCastleCapable, final boolean queenSideCastleCapable) {
+        super(PieceType.KING, piecePosition, pieceColor, isFirstMove);
+        this.isCastled = isCastled;
+        this.kingSideCastleCapable = kingSideCastleCapable;
+        this.queenSideCastleCapable = queenSideCastleCapable;
     }
 
     @Override
@@ -49,15 +63,14 @@ public class King extends Piece {
 
                     //is the piece on the square an enemy piece?
                     if (this.pieceColor != pieceColor) {
-                        legalMoves.add(new Move.AttackMove(board, this, candidateDestinationCoordinate, pieceAtDestination));
+                        legalMoves.add(new Move.MajorAttackMove(board, this, candidateDestinationCoordinate, pieceAtDestination));
                     }//end piece color if statement
                 }//end else
             }
 
 
         }
-
-        return null;
+        return ImmutableList.copyOf(legalMoves);
     }
 
     //check if king is on the first column
@@ -71,6 +84,30 @@ public class King extends Piece {
         return BoardUtils.EIGHTH_COLUMN[currentPosition] && (candidateOffset == -7 || candidateOffset == 1 ||
                 candidateOffset == 9);
     }//end second column exclusion method
+
+    //When a piece is moved, return a new piece with an updated position
+    @Override
+    public King movePiece(final Move move) {
+        return new King(move.getMovedPiece().getPieceColor(), move.getDestinationCoordinate(), false,
+                move.isCastlingMove(),false, false);
+    }
+
+    public boolean isCastled() {
+        return this.isCastled;
+    }
+
+    public boolean isKingSideCastleCapable() {
+        return this.kingSideCastleCapable;
+    }
+
+    public boolean isQueenSideCastleCapable() {
+        return this.queenSideCastleCapable;
+    }
+
+    @Override
+    public int locationBonus(){
+        return this.pieceColor.kingBonus(this.piecePosition);
+    }
 
     @Override
     public String toString() {

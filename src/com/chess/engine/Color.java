@@ -1,10 +1,20 @@
 package com.chess.engine;
 
+import com.chess.engine.board.BoardUtils;
+import com.chess.engine.player.BlackPlayer;
+import com.chess.engine.player.Player;
+import com.chess.engine.player.WhitePlayer;
+
 public enum Color {
     WHITE{
         @Override
         public int getDirection() {
             return -1;
+        }
+
+        @Override
+        public int getOppositeDirection() {
+            return 1;
         }
 
         @Override
@@ -15,6 +25,51 @@ public enum Color {
         @Override
         public boolean isBlack() {
             return false;
+        }
+
+        @Override
+        public boolean isPawnPromotionSquare(int position) {
+            return BoardUtils.EIGHTH_ROW[position];
+        }
+
+        @Override
+        public Player choosePlayer(final WhitePlayer whitePlayer, final BlackPlayer blackPlayer){
+            return whitePlayer;
+        }
+
+        @Override
+        public int pawnBonus(int position) {
+            return WHITE_PAWN_PREFERRED_LOCATION[position];
+        }
+
+        @Override
+        public int knightBonus(int position) {
+            return WHITE_KNIGHT_PREFERRED_LOCATION[position];
+        }
+
+        @Override
+        public int bishopBonus(int position) {
+            return WHITE_BISHOP_PREFERRED_LOCATION[position];
+        }
+
+        @Override
+        public int rookBonus(int position) {
+            return WHITE_ROOK_PREFERRED_LOCATION[position];
+        }
+
+        @Override
+        public int queenBonus(int position) {
+            return WHITE_QUEEN_PREFERRED_LOCATION[position];
+        }
+
+        @Override
+        public int kingBonus(int position) {
+            return WHITE_KING_PREFERRED_LOCATION[position];
+        }
+
+        @Override
+        public String toString(){
+            return "w"; // for FEN purposes
         }
     },
     BLACK{
@@ -24,6 +79,11 @@ public enum Color {
         }
 
         @Override
+        public int getOppositeDirection() {
+            return -1;
+        }
+
+        @Override
         public boolean isWhite() {
             return false;
         }
@@ -32,11 +92,210 @@ public enum Color {
         public boolean isBlack() {
             return true;
         }
+
+        @Override
+        public boolean isPawnPromotionSquare(int position) {
+            return BoardUtils.FIRST_ROW[position];
+        }
+
+        @Override
+        public Player choosePlayer(final WhitePlayer whitePlayer, final BlackPlayer blackPlayer) {
+            return blackPlayer;
+        }
+
+        @Override
+        public int pawnBonus(int position) {
+            return BLACK_PAWN_PREFERRED_LOCATION[position];
+        }
+
+        @Override
+        public int knightBonus(int position) {
+            return BLACK_KNIGHT_PREFERRED_LOCATION[position];
+        }
+
+        @Override
+        public int bishopBonus(int position) {
+            return BLACK_BISHOP_PREFERRED_LOCATION[position];
+        }
+
+        @Override
+        public int rookBonus(int position) {
+            return BLACK_ROOK_PREFERRED_LOCATION[position];
+        }
+
+        @Override
+        public int queenBonus(int position) {
+            return BLACK_QUEEN_PREFERRED_LOCATION[position];
+        }
+
+        @Override
+        public int kingBonus(int position) {
+            return BLACK_KING_PREFERRED_LOCATION[position];
+        }
+
+        @Override
+        public String toString(){
+            return "b"; // for FEN purposes
+        }
     };
 
     //Determine which way is up for the pawns
     public abstract int getDirection();
+    public abstract int getOppositeDirection();
     public abstract boolean isWhite();
     public abstract boolean isBlack();
 
+    public abstract boolean isPawnPromotionSquare(int position);
+
+    public abstract Player choosePlayer(WhitePlayer whitePlayer, BlackPlayer blackPlayer);
+
+
+    // Positional Bonus for evaluation
+
+    public abstract int pawnBonus(int position);
+
+    public abstract int knightBonus(int position);
+
+    public abstract int bishopBonus(int position);
+
+    public abstract int rookBonus(int position);
+
+    public abstract int queenBonus(int position);
+
+    public abstract int kingBonus(int position);
+
+
+    // Where the pieces are best
+
+    private final static int[] WHITE_PAWN_PREFERRED_LOCATION = {
+            0,  0,  0,  0,  0,  0,  0,  0,
+            75, 75, 75, 75, 75, 75, 75, 75,
+            25, 25, 30, 30, 30, 30, 25, 25,
+            5,  5, 10, 55, 55, 10,  5,  5,
+            0,  0, 15, 25, 25,  0,  0,  0,
+            5, -5, 10,  0,  0, -10, -5,  5,
+            5, 10, 5, -20, -20, 10, 10,  5,
+            0,  0, 0,  0,  0,  0,  0,  0
+    };
+
+    private final static int[] BLACK_PAWN_PREFERRED_LOCATION = {
+            0,  0,  0,  0,  0,  0,  0,  0,
+            5, 10, 5, -20,-20, 10, 10,  5,
+            5, -5, 10,  0,  0,-10, -5,  5,
+            0,  0, 15, 25, 25,  0,  0,  0,
+            5,  5, 10, 55, 55, 10,  5,  5,
+            25, 25, 30, 30, 30, 30, 25, 25,
+            75, 75, 75, 75, 75, 75, 75, 75,
+            0,  0,  0,  0,  0,  0,  0,  0
+    };
+
+    private final static int[] WHITE_KNIGHT_PREFERRED_LOCATION = {
+            -50,-40,-30,-30,-30,-30,-40,-50,
+            -40,-20,  0,  0,  0,  0,-20,-40,
+            -30,  5, 10, 15, 15, 10,  5,-30,
+            -30,  5, 15, 20, 20, 15,  5,-30,
+            -30,  5, 15, 20, 20, 15,  5,-30,
+            -30,  5, 10, 15, 15, 10,  5,-30,
+            -40,-20,  0,  5,  5,  0,-20,-40,
+            -50,-40,-30,-30,-30,-30,-40,-50
+    };
+
+    private final static int[] BLACK_KNIGHT_PREFERRED_LOCATION = {
+            -50,-40,-30,-30,-30,-30,-40,-50,
+            -40,-20,  0,  5,  5,  0,-20,-40,
+            -30,  5, 10, 15, 15, 10,  5,-30,
+            -30,  5, 15, 20, 20, 15,  5,-30,
+            -30,  5, 15, 20, 20, 15,  5,-30,
+            -30,  5, 10, 15, 15, 10,  5,-30,
+            -40,-20,  0,  0,  0,  0,-20,-40,
+            -50,-40,-30,-30,-30,-30,-40,-50,
+    };
+
+    private final static int[] WHITE_BISHOP_PREFERRED_LOCATION = {
+            -20,-10,-10,-10,-10,-10,-10,-20,
+            -10,  0,  0,  0,  0,  0,  0,-10,
+            -10,  0,  5, 10, 10,  5,  0,-10,
+            -10,  5,  5, 10, 10,  5,  5,-10,
+            -10,  0, 10, 10, 10, 10,  0,-10,
+            -10, 10, 10, 10, 10, 10, 10,-10,
+            -10, 10,  0,  0,  0,  0, 10,-10,
+            -20,-10,-10,-10,-10,-10,-10,-20
+    };
+
+    private final static int[] BLACK_BISHOP_PREFERRED_LOCATION = {
+            -20,-10,-10,-10,-10,-10,-10,-20,
+            -10, 10,  0,  0,  0,  0, 10,-10,
+            -10, 10, 10, 10, 10, 10, 10,-10,
+            -10,  0, 10, 10, 10, 10,  0,-10,
+            -10,  5,  5, 10, 10,  5,  5,-10,
+            -10,  0,  5, 10, 10,  5,  0,-10,
+            -10,  0,  0,  0,  0,  0,  0,-10,
+            -20,-10,-10,-10,-10,-10,-10,-20,
+    };
+
+    private final static int[] WHITE_ROOK_PREFERRED_LOCATION= {
+            0,  0,  0,  0,  0,  0,  0,  0,
+            5, 20, 20, 20, 20, 20, 20,  5,
+            -5,  0,  0,  0,  0,  0,  0, -5,
+            -5,  0,  0,  0,  0,  0,  0, -5,
+            -5,  0,  0,  0,  0,  0,  0, -5,
+            -5,  0,  0,  0,  0,  0,  0, -5,
+            -5,  0,  0,  0,  0,  0,  0, -5,
+            0,  0,  0,  5,  5,  0,  0,  0
+    };
+
+    private final static int[] BLACK_ROOK_PREFERRED_LOCATION= {
+            0,  0,  0,  5,  5,  0,  0,  0,
+            -5,  0,  0,  0,  0,  0,  0, -5,
+            -5,  0,  0,  0,  0,  0,  0, -5,
+            -5,  0,  0,  0,  0,  0,  0, -5,
+            -5,  0,  0,  0,  0,  0,  0, -5,
+            -5,  0,  0,  0,  0,  0,  0, -5,
+            5, 20, 20, 20, 20, 20, 20,  5,
+            0,  0,  0,  0,  0,  0,  0,  0,
+    };
+
+    private final static int[] WHITE_QUEEN_PREFERRED_LOCATION= {
+            -20,-10,-10, -5, -5,-10,-10,-20,
+            -10,  0,  0,  0,  0,  0,  0,-10,
+            -10,  0,  5,  5,  5,  5,  0,-10,
+            -5,  0,  5,  5,  5,  5,  0, -5,
+            0,  0,  5,  5,  5,  5,  0, -5,
+            -10,  5,  5,  5,  5,  5,  0,-10,
+            -10,  0,  5,  0,  0,  0,  0,-10,
+            -20,-10,-10, -5, -5,-10,-10,-20
+    };
+
+    private final static int[] BLACK_QUEEN_PREFERRED_LOCATION = {
+            -20,-10,-10, -5, -5,-10,-10,-20,
+            -10,  0,  5,  0,  0,  0,  0,-10,
+            -10,  5,  5,  5,  5,  5,  0,-10,
+            0,  0,  5,  5,  5,  5,  0, -5,
+            0,  0,  5,  5,  5,  5,  0, -5,
+            -10,  0,  5,  5,  5,  5,  0,-10,
+            -10,  0,  0,  0,  0,  0,  0,-10,
+            -20,-10,-10, -5, -5,-10,-10,-20
+    };
+
+    private final static int[] WHITE_KING_PREFERRED_LOCATION = { //TODO make different for different phases of game?
+            -30,-40,-40,-50,-50,-40,-40,-30,
+            -30,-40,-40,-50,-50,-40,-40,-30,
+            -30,-40,-40,-50,-50,-40,-40,-30,
+            -30,-40,-40,-50,-50,-40,-40,-30,
+            -20,-30,-30,-40,-40,-30,-30,-20,
+            -10,-20,-20,-20,-20,-20,-20,-10,
+            20, 20,  0,  0,  0,  0, 20, 20,
+            20, 30, 10,  0,  0, 10, 30, 20
+    };
+
+    private final static int[] BLACK_KING_PREFERRED_LOCATION = {
+            20, 30, 10,  0,  0, 10, 30, 20,
+            20, 20,  0,  0,  0,  0, 20, 20,
+            -10,-20,-20,-20,-20,-20,-20,-10,
+            -20,-30,-30,-40,-40,-30,-30,-20,
+            -30,-40,-40,-50,-50,-40,-40,-30,
+            -30,-40,-40,-50,-50,-40,-40,-30,
+            -30,-40,-40,-50,-50,-40,-40,-30,
+            -30,-40,-40,-50,-50,-40,-40,-30
+    };
 }

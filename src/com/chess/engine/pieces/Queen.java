@@ -17,7 +17,13 @@ public class Queen extends Piece{
     private final static int[] CANDIDATE_MOVE_COORDINATES = {-9, -8, -7, -1, 1, 7, 8, 9};
 
     public Queen(final Color pieceColor, final int piecePosition) {
-        super(piecePosition, pieceColor);
+
+        super(PieceType.QUEEN, piecePosition, pieceColor, true);
+    }
+
+    public Queen(final Color pieceColor, final int piecePosition, final boolean isFirstMove) {
+
+        super(PieceType.QUEEN, piecePosition, pieceColor, isFirstMove);
     }
 
     @Override
@@ -53,7 +59,7 @@ public class Queen extends Piece{
 
                         //is the piece on the square an enemy piece?
                         if (this.pieceColor != pieceColor) {
-                            legalMoves.add(new Move.AttackMove(board, this, candidateDestinationCoordinate, pieceAtDestination));
+                            legalMoves.add(new Move.MajorAttackMove(board, this, candidateDestinationCoordinate, pieceAtDestination));
                         }//end piece color if statement
 
                         break; //Square in the path is occupied - break out of loop. Do not consider other moves legal
@@ -77,6 +83,17 @@ public class Queen extends Piece{
     private static boolean isOnEiththColumn(final int currentPosition, final int candidateOffset)  {
         return BoardUtils.EIGHTH_COLUMN[currentPosition] && (candidateOffset == -7 ||
                 candidateOffset == 1 || candidateOffset == 9);
+    }
+
+    //When a piece is moved, return a new piece with an updated position
+    @Override
+    public Queen movePiece(final Move move) {
+        return new Queen(move.getMovedPiece().getPieceColor(), move.getDestinationCoordinate());
+    }
+
+    @Override
+    public int locationBonus(){
+        return this.pieceColor.queenBonus(this.piecePosition);
     }
 
     @Override

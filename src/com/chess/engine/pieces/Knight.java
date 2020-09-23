@@ -18,7 +18,11 @@ public class Knight extends Piece{
 
 
     public Knight(final Color pieceColor, final int piecePosition) {
-        super(piecePosition, pieceColor);
+        super(PieceType.KNIGHT, piecePosition, pieceColor, true);
+    }
+
+    public Knight(final Color pieceColor, final int piecePosition, final boolean isFirstMove) {
+        super(PieceType.KNIGHT, piecePosition, pieceColor, isFirstMove);
     }
 
     @Override
@@ -51,7 +55,7 @@ public class Knight extends Piece{
 
                     //is the piece on the square an enemy piece?
                     if (this.pieceColor != pieceColor) {
-                        legalMoves.add(new Move.AttackMove(board, this, candidateDestinationCoordinate, pieceAtDestination));
+                        legalMoves.add(new Move.MajorAttackMove(board, this, candidateDestinationCoordinate, pieceAtDestination));
                     }//end piece color if statement
                 }//end else
             }//end if statement
@@ -83,6 +87,17 @@ public class Knight extends Piece{
         return BoardUtils.EIGHTH_COLUMN[currentPosition] && (candidateOffset == -15 || candidateOffset == -6 ||
                 candidateOffset == 10 || candidateOffset == 17);
     }//end eighth column exclusion method
+
+    //When a piece is moved, return a new piece with an updated position
+    @Override
+    public Knight movePiece(final Move move) {
+        return new Knight(move.getMovedPiece().getPieceColor(), move.getDestinationCoordinate());
+    }
+
+    @Override
+    public int locationBonus(){
+        return this.pieceColor.knightBonus(this.piecePosition);
+    }
 
     @Override
     public String toString() {

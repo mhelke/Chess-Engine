@@ -2,13 +2,12 @@ package com.chess.engine.board;
 
 import com.chess.engine.pieces.Piece;
 import com.google.common.collect.ImmutableMap;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Square {
 
-    protected final int coordinate;
+    private final int coordinate;
 
     private static final Map<Integer, EmptySquare> EMPTY_SQUARES_CHACHE = createAllPossibleEmptySquares();
 
@@ -41,7 +40,12 @@ public abstract class Square {
     // Method to retrieve a piece on a square
     public abstract Piece getPiece();
 
+    // Method to get square coordinate
+    public int getCoordinate(){
+        return this.coordinate;
+    }
     // If the square is empty
+
     public static final class EmptySquare extends Square{
 
         private  EmptySquare(final int coordinate){
@@ -75,7 +79,7 @@ public static final class OccupiedSquare extends Square{
 
     @Override
     public String toString(){
-        return getPiece().getPieceColor().isBlack() ? toString().toLowerCase() :
+        return getPiece().getPieceColor().isBlack() ? getPiece().toString().toLowerCase() :
                 getPiece().toString();
 
     }
@@ -90,6 +94,4 @@ public static final class OccupiedSquare extends Square{
         return this.pieceOnSquare;
     }
 }
-
-
 }
